@@ -412,8 +412,13 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                         >
                             Borrar notificación
                         </DialogTitle>
-                        <DialogContent>
-                            ¿Seguro que desea borrar esta notificación? 
+                        <DialogContent sx={{display:"flex", flexDirection: "column", gap:2}}>
+                            <Typography variant="subtitle1" sx={{mt:2}}>
+                                <strong>Notificación: {selectedNotification?.title}</strong>
+                            </Typography>
+                            <Typography variant="subtitle1">
+                                ¿Seguro que desea borrar esta notificación?
+                            </Typography>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={() => setOpenDeleteDialog(false)} color="primary">

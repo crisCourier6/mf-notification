@@ -8,7 +8,7 @@ import UserNotifications from "./components/UserNotifications";
 function App() {
   return (
     <div className="App">
-      <Router>
+      <Router basename="/mf-notification">
           <Routes>
               <Route path="/profile" element={<UserNotifications isAppBarVisible={false} />}/>
           </Routes>
