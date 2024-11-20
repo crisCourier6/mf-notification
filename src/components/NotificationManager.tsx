@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Box, Alert, Grid, Dialog, DialogContent, DialogActions, TextField, Snackbar, 
     IconButton, Typography, DialogTitle, Tooltip, Checkbox} from '@mui/material';
 import api from "../api";
-import { useEffect, useState } from 'react';
 import { DataGrid, GridColDef, GridFilterModel, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid"
 import { esES } from '@mui/x-data-grid/locales';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -309,7 +308,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
     }
 
     return ( 
-        <Grid container 
+        allDone && <Grid container 
         display="flex" 
         flexDirection="column" 
         justifyContent="center" 

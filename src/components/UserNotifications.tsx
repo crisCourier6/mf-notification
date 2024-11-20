@@ -1,9 +1,7 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../api';
 import { Box, Card, CardContent, Grid, IconButton, Typography, Button, Dialog, DialogActions, 
-    DialogContent, Snackbar, SnackbarCloseReason, CardActions, Tooltip, Alert, DialogTitle } from '@mui/material';
-import { CircularProgress } from "@mui/material";
+    DialogContent, Snackbar, SnackbarCloseReason, CardActions, Tooltip, Alert, DialogTitle, CircularProgress } from '@mui/material';
 import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 import { UserHasNotification } from '../interfaces/UserHasNotification';
 import dayjs from 'dayjs';
@@ -12,7 +10,6 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
     const id = window.localStorage.getItem("id")
     const userNotificationsURL = "/userhasnotification"
     const [notifications, setNotifications] = useState<UserHasNotification[]>([])
-    const currentUserId = window.localStorage.id;
     const [notificationsFiltered, setNotificationsFiltered] = useState<UserHasNotification[]>([])
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarMsg, setSnackbarMsg] = useState("")
