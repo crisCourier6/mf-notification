@@ -7,7 +7,8 @@ import { UserHasNotification } from '../interfaces/UserHasNotification';
 import dayjs from 'dayjs';
 
 const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVisible }) => {
-    const id = window.localStorage.getItem("id")
+    const token = window.sessionStorage.getItem("token") || window.localStorage.getItem("token")
+    const currentUserId = window.sessionStorage.getItem("id") || window.localStorage.getItem("id")
     const userNotificationsURL = "/userhasnotification"
     const [notifications, setNotifications] = useState<UserHasNotification[]>([])
     const [notificationsFiltered, setNotificationsFiltered] = useState<UserHasNotification[]>([])
@@ -21,10 +22,10 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
 
     useEffect(() => {
         document.title = `Notificaciones - EyesFood`
-        api.get(`${userNotificationsURL}/byuser/${id}${queryParams}`, {
+        api.get(`${userNotificationsURL}/byuser/${currentUserId}${queryParams}`, {
             withCredentials: true,
             headers: {
-                Authorization: "Bearer " + window.localStorage.token
+                Authorization: "Bearer " + token
             }
         })
         .then(res => {
@@ -55,7 +56,7 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
         setSelectedNotification(notification);
         setOpenNotification(true);
         if (!notification.seen){
-            api.patch(`${userNotificationsURL}/byuser/${id}`,
+            api.patch(`${userNotificationsURL}/byuser/${currentUserId}`,
                 {
                     notificationId: notification.notificationId,
                     seen: true
@@ -63,7 +64,7 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
                 {
                     withCredentials: true,
                     headers: {
-                        Authorization: "Bearer " + window.localStorage.token
+                        Authorization: "Bearer " + token
                     }
                 }
             )
@@ -95,7 +96,7 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
             {
                 withCredentials: true,
                 headers: {
-                    Authorization: "Bearer " + window.localStorage.token
+                    Authorization: "Bearer " + token
                 }
             }
         )
@@ -266,7 +267,9 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
                     {selectedNotification?.notification.title}
                 </DialogTitle>
                 <DialogContent>
-                    {selectedNotification?.notification.content}
+                    <Typography variant="subtitle1">
+                        {selectedNotification?.notification.content}
+                    </Typography>
                 </DialogContent>
                 <DialogActions>
                     <Button variant='contained' onClick={handleCloseNotification}>

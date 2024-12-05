@@ -4,7 +4,7 @@ import { Button, Box, Alert, Grid, Dialog, DialogContent, DialogActions, TextFie
 import api from "../api";
 import { DataGrid, GridColDef, GridFilterModel, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid"
 import { esES } from '@mui/x-data-grid/locales';
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisible }) => {
     const notificationsURL = "/notification"
     const userHasNotificationURL = "/userhasnotification"
+    const token = window.sessionStorage.getItem("token") || window.localStorage.getItem("token")
     const [notifications, setNotifications] = useState<Notification[]>([])
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [newTitle, setNewTitle] = useState("")
@@ -36,7 +37,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
         api.get(`${notificationsURL}${queryParams}`, {
             withCredentials: true,
             headers: {
-                Authorization: "Bearer " + window.localStorage.token
+                Authorization: "Bearer " + token
             }
         })
         .then(res => {
@@ -114,7 +115,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                         <IconButton color="error" onClick={() => {
                             setSelectedNotification(params.row);
                             setOpenDeleteDialog(true);}}>
-                            <DeleteIcon />
+                            <DeleteForeverRoundedIcon />
                         </IconButton>
                     </Tooltip>
                     
@@ -129,7 +130,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
             await api.delete(`${notificationsURL}/byid/${selectedNotification?.id}`, {
                 withCredentials: true,
                 headers: {
-                    Authorization: "Bearer " + window.localStorage.token
+                    Authorization: "Bearer " + token
                 }
             });
             setNotifications(notifications.filter(notif => notif.id !== selectedNotification?.id));
@@ -153,7 +154,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
             {
                 withCredentials: true,
                 headers: {
-                    Authorization: "Bearer " + window.localStorage.token
+                    Authorization: "Bearer " + token
                 }
             }
         )
@@ -192,7 +193,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
             {
                 withCredentials: true,
                 headers: {
-                    Authorization: "Bearer " + window.localStorage.token
+                    Authorization: "Bearer " + token
                 }
             }
         )
@@ -225,7 +226,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
             {
                 withCredentials: true,
                 headers: {
-                    Authorization: "Bearer " + window.localStorage.token
+                    Authorization: "Bearer " + token
                 }
             }
         )
@@ -257,7 +258,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
             {
                 withCredentials: true,
                 headers: {
-                    Authorization: "Bearer " + window.localStorage.token
+                    Authorization: "Bearer " + token
                 }
             }
         )

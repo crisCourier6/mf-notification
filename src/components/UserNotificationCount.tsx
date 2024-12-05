@@ -4,17 +4,18 @@ import { Badge } from '@mui/material';
 import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded';
 
 const UserNotificationCount: React.FC = () => {
-    const id = window.localStorage.getItem("id")
+    const token = window.sessionStorage.getItem("token") || window.localStorage.getItem("token")
+    const currentUserId = window.sessionStorage.getItem("id") || window.localStorage.getItem("id")
     const [notificationCount, setNotificationCount] = useState(0)
     const userNotificationsURL = "/userhasnotification"
     const queryParams = "?c=true"
     
     useEffect(() => {
-        if (id){
-            api.get(`${userNotificationsURL}/byuser/${id}${queryParams}`, {
+        if (currentUserId){
+            api.get(`${userNotificationsURL}/byuser/${currentUserId}${queryParams}`, {
                 withCredentials: true,
                 headers: {
-                    Authorization: "Bearer " + window.localStorage.token
+                    Authorization: "Bearer " + token
                 }
             })
             .then(res => {
