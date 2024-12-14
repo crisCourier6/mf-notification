@@ -29,7 +29,6 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
             }
         })
         .then(res => {
-            console.log(res.data)
             setNotifications(res.data)
             setNotificationsFiltered(res.data)
         })
@@ -69,7 +68,6 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
                 }
             )
             .then(res =>{
-                console.log(res)
                 setNotifications((prevNotifs)=>
                     prevNotifs.map((notif) =>
                         notif.notificationId === res.data.notificationId ? res.data : notif)

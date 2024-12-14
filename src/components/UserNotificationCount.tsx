@@ -19,7 +19,6 @@ const UserNotificationCount: React.FC = () => {
                 }
             })
             .then(res => {
-                console.log(res.data)
                 setNotificationCount(res.data.count)
             })
             .catch(error => {
