@@ -620,7 +620,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                         onClose={handleCloseSnackbar}
                         message={snackbarMsg}
                     >
-                        <Alert onClose={handleCloseSnackbar} severity={snackbarMsg.includes("Error")?"error":"success"} sx={{ width: '100%' }}>
+                        <Alert variant="filled" onClose={handleCloseSnackbar} severity={snackbarMsg.includes("Error")?"error":"success"} sx={{ width: '100%' }}>
                             {snackbarMsg}
                         </Alert>
                     </Snackbar>

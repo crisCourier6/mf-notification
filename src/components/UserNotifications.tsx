@@ -124,7 +124,7 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
                 onClose={handleSnackbarClose}
                 message={snackbarMsg}
             >
-                <Alert onClose={handleSnackbarClose} severity={snackbarMsg.includes("Error")?"error":"success"} sx={{ width: '100%' }}>
+                <Alert variant="filled" onClose={handleSnackbarClose} severity={snackbarMsg.includes("Error")?"error":"success"} sx={{ width: '100%' }}>
                     {snackbarMsg}
                 </Alert>
             </Snackbar>
@@ -155,7 +155,11 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
                 </Typography>
             </Box> 
 
-            { notificationsFiltered.map((notif)=>{
+            { notificationsFiltered.length==0
+            ?   <Typography variant='subtitle1'>
+                    No tienes notificaciones
+                </Typography>
+            :   notificationsFiltered.map((notif)=>{
                 return (
                 <Card key={notif.notificationId} sx={{
                 border: "4px solid", 
