@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
 import { createTheme, ThemeProvider } from '@mui/material';
 
 declare module '@mui/material/Button' {
@@ -25,7 +24,7 @@ const theme = createTheme({
     secondary: {
       light: '#eefded',
       main: "#9bf096",
-      dark: '#008537',
+      dark: '#006e00',
       contrastText: '#22323f',
     },
   },

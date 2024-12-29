@@ -31,7 +31,7 @@ const UserNotificationCount: React.FC = () => {
     return ( 
         <Badge
             badgeContent={notificationCount}
-            color={notificationCount > 0 ? "error" : "default"} // red if count > 0, grey otherwise
+            color={notificationCount > 0 ? "warning" : "default"} // red if count > 0, grey otherwise
             overlap="circular"
             anchorOrigin={{
                 vertical: "top",

@@ -2,21 +2,26 @@ import React, { useEffect, useState } from "react";
 import { Button, Box, Alert, Grid, Dialog, DialogContent, DialogActions, TextField, Snackbar, 
     IconButton, Typography, DialogTitle, Tooltip, Checkbox} from '@mui/material';
 import api from "../api";
-import { DataGrid, GridColDef, GridFilterModel, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid"
+import { DataGrid, GridColDef, GridFilterModel, GridRenderCellParams, GridToolbar, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton } from "@mui/x-data-grid"
 import { esES } from '@mui/x-data-grid/locales';
 import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import CancelScheduleSendRoundedIcon from '@mui/icons-material/CancelScheduleSendRounded';
+import CloseIcon from '@mui/icons-material/Close';
 import { Notification } from "../interfaces/Notification";
 import dayjs from "dayjs";
+import NavigateBack from "./NavigateBack";
 
 const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisible }) => {
     const notificationsURL = "/notification"
     const userHasNotificationURL = "/userhasnotification"
     const token = window.sessionStorage.getItem("token") || window.localStorage.getItem("token")
     const [notifications, setNotifications] = useState<Notification[]>([])
+    const [filteredNotifications, setFilteredNotifications] = useState<Notification[]>([])
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [newTitle, setNewTitle] = useState("")
     const [newContent, setNewContent] = useState("")
@@ -29,6 +34,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
     const [filterModel, setFilterModel] = useState<GridFilterModel>({items: [] });
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMsg, setSnackbarMsg] = useState('');
+    const [showInactive, setShowInactive] = useState(true);
     const [allDone, setAllDone] = useState(false)
     
     useEffect(()=>{
@@ -49,6 +55,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                 updatedAt: new Date(notif.updatedAt),
             }));
             setNotifications(transformedNotif)
+            setFilteredNotifications(transformedNotif)
         })
         .catch(error => console.log(error.response))
         .finally(()=>{
@@ -56,26 +63,48 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
         })
     },[])
 
+    useEffect(()=>{
+        if (showInactive){
+            setFilteredNotifications(notifications)
+        }
+        else{
+            setFilteredNotifications(notifications.filter((row:Notification) => row.isActive))
+        }
+    }, [showInactive])
+
     const columns: GridColDef[] = [
-        {field: "updatedAt", headerName: "Fecha creación", flex: 1, headerClassName: "header-colors", headerAlign: "center", align: "center", 
+        {field: "updatedAt", headerName: "Modificada el", flex: 1, headerClassName: "header-colors", headerAlign: "center", align: "center", 
             type: "date"
         },
-        {field: "createdAt", headerName: "Fecha modificación", flex: 1, headerClassName: "header-colors", headerAlign: "center", align: "center", 
+        {field: "createdAt", headerName: "Creada el", flex: 1, headerClassName: "header-colors", headerAlign: "center", align: "center", 
             type: "date"
         },
-        {field: "lastSentAt", headerName: "Envíado", flex: 1, headerClassName: "header-colors", headerAlign: "center", align: "center", 
+        {field: "lastSentAt", headerName: "Envíada el", flex: 1, headerClassName: "header-colors", headerAlign: "center", align: "center", 
             type: "date",
             valueFormatter: (params) => {
                 return params.value ? new Date(params.value).toLocaleDateString() : "Nunca";
             },
         },
         {field: "title", headerName: "Título", flex: 1.5, headerClassName: "header-colors", headerAlign: "center"},
-        {field: "content", headerName: "Contenido", flex: 2, headerClassName: "header-colors", headerAlign: "center"},
+        {field: "content", headerName: "Contenido", flex: 2.5, headerClassName: "header-colors", headerAlign: "center",
+            renderCell: (params) => (
+                <Box
+                  sx={{
+                    whiteSpace: "normal",
+                    wordWrap: "break-word",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {params.value}
+                </Box>
+              ),
+        },
         
         {
             field: 'actions',
             headerName: 'Acciones',
-            flex: 1.5,
+            flex: 1,
             headerClassName: "header-colors",
             headerAlign: "center", 
             type: "actions",
@@ -87,37 +116,44 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                     gap: 1,
                     height: '100%',
                 }}>
-                    <Tooltip title="Editar" key="edit" placement="left" arrow={true}>
-                        <IconButton color="primary" onClick={() => {
-                            setSelectedNotification(params.row);
-                            setNewTitle(params.row.title)
-                            setNewContent(params.row.content)
-                            setOpenEditDialog(true);}}>
-                            <EditIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Enviar" key="send" placement="top" arrow>
-                        <IconButton color="primary" onClick={() => {
-                            setSelectedNotification(params.row);
-                            setOpenSendDialog(true);}}>
-                            <SendRoundedIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Deshabilitar" key="disable" placement="top" arrow={true}>
-                        <IconButton color="warning" onClick={() => {
-                            setSelectedNotification(params.row);
-                            setOpenDisableDialog(true);}}>
-                            <CancelScheduleSendRoundedIcon />
-                        </IconButton>
-                    </Tooltip>
+                    {
+                        params.row.isActive 
+                            ?   <>
+                                    <Tooltip title="Editar" key="edit" placement="left" arrow={true}>
+                                        <IconButton color="primary" onClick={() => {
+                                            setSelectedNotification(params.row);
+                                            setNewTitle(params.row.title)
+                                            setNewContent(params.row.content)
+                                            setOpenEditDialog(true);}}>
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Enviar" key="send" placement="top" arrow>
+                                        <IconButton color="primary" onClick={() => {
+                                            setSelectedNotification(params.row);
+                                            setOpenSendDialog(true);}}>
+                                            <SendRoundedIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title="Eliminar" key="delete" placement="right" arrow>
+                                        <IconButton color="error" onClick={() => {
+                                            setSelectedNotification(params.row);
+                                            setOpenDeleteDialog(true);}}>
+                                            <DeleteForeverRoundedIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </>
+                            :   <>
+                                     <Tooltip title="Eliminar" key="delete" placement="right" arrow>
+                                        <IconButton color="error" onClick={() => {
+                                            setSelectedNotification(params.row);
+                                            setOpenDeleteDialog(true);}}>
+                                            <DeleteForeverRoundedIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </>
+                    }
                     
-                    <Tooltip title="Eliminar" key="delete" placement="right" arrow>
-                        <IconButton color="error" onClick={() => {
-                            setSelectedNotification(params.row);
-                            setOpenDeleteDialog(true);}}>
-                            <DeleteForeverRoundedIcon />
-                        </IconButton>
-                    </Tooltip>
                     
                     
                 </Box>
@@ -171,6 +207,11 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                     notif.id===newNotif.id ? newNotif : notif
                 )
             )
+            setFilteredNotifications((prevNotifs) => 
+                prevNotifs.map((notif) =>
+                    notif.id===newNotif.id ? newNotif : notif
+                )
+            )
            
         })
         .catch(error=>{
@@ -210,7 +251,8 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                 lastSentAt: res.data.lastSentAt? new Date(res.data.lastSentAt):null,
                 updatedAt: new Date(res.data.updatedAt),
             }
-            setNotifications((prevNotifs) => [newNotif, ...prevNotifs])    
+            setNotifications((prevNotifs) => [newNotif, ...prevNotifs])   
+            setFilteredNotifications((prevNotifs) => [newNotif, ...prevNotifs])   
         })
         .catch(error=>{
             setSnackbarMsg("Error al crear notificación")
@@ -237,8 +279,14 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                 createdAt: new Date(res.data.createdAt), // Convert `createdAt` to a Date object
                 lastSentAt: res.data.lastSentAt? new Date(res.data.lastSentAt):null,
                 updatedAt: new Date(res.data.updatedAt),
+                isActive: false
             }
             setNotifications((prevNotifs) => 
+                prevNotifs.map((notif) =>
+                    notif.id===newNotif.id ? newNotif : notif
+                )
+            )
+            setFilteredNotifications((prevNotifs) => 
                 prevNotifs.map((notif) =>
                     notif.id===newNotif.id ? newNotif : notif
                 )
@@ -254,7 +302,10 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
     }
 
     const handleDisable = () => {
-        api.delete(`${userHasNotificationURL}/bynotif/${selectedNotification?.id}`,
+        api.patch(`${notificationsURL}/byid/${selectedNotification?.id}`,
+            {
+                isActive: false
+            },
             {
                 withCredentials: true,
                 headers: {
@@ -263,7 +314,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
             }
         )
         .then(res => {
-            setSnackbarMsg(res.data.message)
+            setSnackbarMsg("Notificación desactivada con éxito")
         })
         .catch(error=>{
             console.log(error)
@@ -308,6 +359,41 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
         setOpenCreateDialog(false)
     }
 
+    const CustomToolbar: React.FC = () => (
+        <GridToolbarContainer
+        sx={{
+            border: "2px solid",
+            borderColor: 'primary.dark', // Change the background color
+        }}>
+            <GridToolbarColumnsButton/>
+            <GridToolbarFilterButton/>
+            <GridToolbarDensitySelector/>
+            <GridToolbarExport />
+            <Tooltip
+                title={showInactive ? "Ocultar Inactivos" : "Mostrar Inactivos"}
+                key="toggle"
+                placement="bottom"
+                >
+                <Button
+                    onClick={() => setShowInactive((prev) => !prev)}
+                    sx={{ fontSize: 13, gap:1 }}
+                >
+                    {showInactive ? <VisibilityOff/> : <Visibility/>}
+                    {showInactive ? <>Ocultar enviadas</> : <>Mostrar enviadas</>}
+                </Button>
+            </Tooltip>
+            <Tooltip title="Crear notificación" key="create" placement="bottom">
+                <Button
+                    onClick={handleOpenCreateNotif}
+                    sx={{fontSize: 13}}
+                >
+                    <AddIcon/>
+                    Crear
+                </Button>
+            </Tooltip>
+        </GridToolbarContainer>
+    );
+
     return ( 
         allDone && <Grid container 
         display="flex" 
@@ -318,7 +404,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
             <Box 
             sx={{
                 display: "flex",
-                flexDirection: "column",
+                flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
                 maxWidth: "500px",
@@ -334,12 +420,19 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                 borderLeft: "5px solid",
                 borderRight: "5px solid",
                 borderColor: "secondary.main",
+                color: "primary.contrastText",
                 boxSizing: "border-box"
             }}
             >
-                <Typography variant='h5' width="100%" sx={{py:0.5}} color= "primary.contrastText">
-                    Notificaciones
-                </Typography>
+                <Box sx={{display: "flex", flex: 1}}>
+                    <NavigateBack/>
+                </Box>
+                <Box sx={{display: "flex", flex: 4}}>
+                    <Typography variant='h5' width="100%"  color="primary.contrastText" sx={{py:1}}>
+                        Notificaciones
+                    </Typography>
+                </Box>
+                <Box sx={{display: "flex", flex: 1}}/>
             </Box>
             <Box sx={{
                 display: "flex",
@@ -353,15 +446,24 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                 
             }}>
                 <DataGrid 
-                    rows={notifications}
+                    rows={filteredNotifications}
                     columns={columns}
-                    rowHeight={32}
+                    autoHeight
+                    getRowHeight={() => "auto"} // Dynamically adjust row height
                     initialState={{
                         pagination: {
                             paginationModel: { page: 0, pageSize: 10 },
                         },
+                        columns: {
+                            columnVisibilityModel: {
+                                updatedAt: false
+                            },
+                        },
                     }}
-                    slots={{ toolbar: GridToolbar }}
+                    getRowClassName={(params) =>
+                        !params.row.isActive ? "inactive-row" : ""
+                    }
+                    slots={{ toolbar: CustomToolbar }}
                     pageSizeOptions={[5, 10]}
                     filterModel={filterModel}
                     onFilterModelChange={(newFilterModel) => setFilterModel(newFilterModel)}
@@ -375,8 +477,11 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                             fontFamily: "Montserrat"
                         },
                         '& .MuiDataGrid-row:nth-of-type(even)': {
-                            backgroundColor: '#ffffff', // White for even rows
+                            backgroundColor: 'secondary.light', // White for even rows
                             fontFamily: "Montserrat"
+                        },
+                        "& .MuiDataGrid-row.inactive-row": {
+                            backgroundColor: "#dedede", // Light gray background for inactive rows
                         },
                         '& .MuiDataGrid-sortIcon': {
                             color: 'primary.contrastText', // Change sort icon color
@@ -515,7 +620,16 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                         bgcolor: "primary.dark", 
                         color: "primary.contrastText"
                         }}>
-                            Editar notificación 
+                            <Box sx={{display:"flex", justifyContent: "space-between", width: "100%"}}>
+                                Editar Notificación
+                                <IconButton
+                                color="inherit"
+                                onClick={handleCloseEditDialog}
+                                sx={{p:0}}
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            </Box>
                         </DialogTitle>
                         <DialogContent sx={{
                             padding:0.5,
@@ -550,9 +664,6 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                             color="primary">
                                 Guardar
                             </Button>
-                            <Button variant="contained" onClick={handleCloseEditDialog} color="primary">
-                                Salir
-                            </Button>
                         </DialogActions>
                     </Dialog>
                     <Dialog open={openCreateDialog} onClose={handleCloseCreateNotif}
@@ -565,11 +676,21 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                       }}>
                         <DialogTitle 
                         sx={{display: "flex", 
-                        justifyContent: "center", 
+                        justifyContent: "space-between", 
                         bgcolor: "primary.dark", 
                         color: "primary.contrastText"
                         }}>
-                            Crear notificación 
+                            <Box sx={{display:"flex", justifyContent: "space-between", width: "100%"}}>
+                                Crear Notificación
+                                <IconButton
+                                color="inherit"
+                                onClick={handleCloseCreateNotif}
+                                sx={{p:0}}
+                                >
+                                    <CloseIcon />
+                                </IconButton>
+                            </Box>
+                           
                         </DialogTitle>
                         <DialogContent sx={{
                             padding:0.5,
@@ -608,9 +729,6 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                             color="primary">
                                 Guardar
                             </Button>
-                            <Button variant="contained" onClick={handleCloseCreateNotif} color="primary">
-                                Salir
-                            </Button>
                         </DialogActions>
                     </Dialog>
                     
@@ -624,24 +742,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                             {snackbarMsg}
                         </Alert>
                     </Snackbar>
-                    <Button onClick={handleOpenCreateNotif}
-                        variant="dark" 
-                        sx={{
-                            display: "flex",
-                            position: 'fixed',
-                            bottom: 0, // 16px from the bottom
-                            zIndex: 100, // High zIndex to ensure it's on top of everything
-                            height: "48px",
-                            width: "50%",
-                            maxWidth: "500px"
-                        }}
-                    >
-                        <AddIcon sx={{fontSize: 40}}></AddIcon>
-                        <Typography variant='subtitle1' color={"inherit"}>
-                            Crear notificación
-                        </Typography>
-                        
-                    </Button>
+                    
                     
             </Box>
         </Grid>

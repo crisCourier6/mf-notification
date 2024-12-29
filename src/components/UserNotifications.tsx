@@ -5,6 +5,7 @@ import { Box, Card, CardContent, Grid, IconButton, Typography, Button, Dialog, D
 import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 import { UserHasNotification } from '../interfaces/UserHasNotification';
 import dayjs from 'dayjs';
+import NavigateBack from './NavigateBack';
 
 const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVisible }) => {
     const token = window.sessionStorage.getItem("token") || window.localStorage.getItem("token")
@@ -139,20 +140,27 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
                     zIndex: 100,
                     boxShadow: 3,
                     display: "flex",
-                    flexDirection: "column",
+                    flexDirection: "row",
                     alignItems: "center",
+                    justifyContent: "center",
                     borderBottom: "5px solid",
+                    borderLeft: "5px solid",
+                    borderRight: "5px solid",
+                    color: "primary.contrastText",
                     borderColor: "secondary.main",
                     boxSizing: "border-box"
                   }}
             >
-                <Typography variant='h5' width="100%"  color="primary.contrastText" sx={{py:1, borderLeft: "3px solid",
-                    borderRight: "3px solid",
-                    borderColor: "secondary.main",
-                    boxSizing: "border-box",
-                }}>
-                    Notificaciones
-                </Typography>
+                <Box sx={{display: "flex", flex: 1}}>
+                    <NavigateBack/>
+                </Box>
+                <Box sx={{display: "flex", flex: 4}}>
+                    <Typography variant='h6' width="100%" sx={{py:1, color: "inherit"}}>
+                        Mis notificaciones
+                    </Typography>
+                </Box>
+                <Box sx={{display: "flex", flex: 1}}>
+                </Box>
             </Box> 
 
             { notificationsFiltered.length==0

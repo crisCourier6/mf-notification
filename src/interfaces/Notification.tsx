@@ -8,5 +8,6 @@ export interface Notification {
     createdAt:Date,
     updatedAt:Date,
     lastSentAt: Date,
-    userHasNotification:UserHasNotification[]
+    userHasNotification:UserHasNotification[],
+    isActive: boolean
 }
