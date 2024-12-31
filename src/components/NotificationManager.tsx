@@ -70,7 +70,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
         else{
             setFilteredNotifications(notifications.filter((row:Notification) => row.isActive))
         }
-    }, [showInactive])
+    }, [showInactive, notifications])
 
     const columns: GridColDef[] = [
         {field: "updatedAt", headerName: "Modificada el", flex: 1, headerClassName: "header-colors", headerAlign: "center", align: "center", 
@@ -89,6 +89,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
         {field: "content", headerName: "Contenido", flex: 2.5, headerClassName: "header-colors", headerAlign: "center",
             renderCell: (params) => (
                 <Box
+                    key={params.row.id}
                   sx={{
                     whiteSpace: "normal",
                     wordWrap: "break-word",
@@ -109,7 +110,7 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
             headerAlign: "center", 
             type: "actions",
             renderCell: (params: GridRenderCellParams) => (
-                <Box sx={{
+                <Box  key={params.row.id} sx={{
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -177,7 +178,6 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
         } finally {
             setOpenDeleteDialog(false);
             setSnackbarOpen(true);
-            setSelectedNotification(null)
         }
     };
 

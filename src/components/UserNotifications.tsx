@@ -5,6 +5,7 @@ import { Box, Card, CardContent, Grid, IconButton, Typography, Button, Dialog, D
 import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 import { UserHasNotification } from '../interfaces/UserHasNotification';
 import dayjs from 'dayjs';
+import CloseIcon from '@mui/icons-material/Close';
 import NavigateBack from './NavigateBack';
 
 const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVisible }) => {
@@ -87,7 +88,6 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
 
     const handleCloseNotification = () => {
         setOpenNotification(false);
-        setSelectedNotification(null);
     };
 
     const handleDeleteNotification = (notification: UserHasNotification) => {
@@ -273,8 +273,19 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
                         maxWidth: "500px"
                     }
                 }}>
+                    
                 <DialogTitle>
-                    {selectedNotification?.notification.title}
+                    <Box sx={{display:"flex", justifyContent: "space-between"}}>
+                        {selectedNotification?.notification.title}
+                            <IconButton
+                            color="inherit"
+                            onClick={handleCloseNotification}
+                            sx={{p:0}}
+                            >
+                                <CloseIcon />
+                            </IconButton>
+                    </Box>
+                    
                 </DialogTitle>
                 <DialogContent>
                     <Typography variant="subtitle1">
@@ -282,9 +293,6 @@ const UserNotifications: React.FC<{ isAppBarVisible: boolean }> = ({ isAppBarVis
                     </Typography>
                 </DialogContent>
                 <DialogActions>
-                    <Button variant='contained' onClick={handleCloseNotification}>
-                        Cerrar
-                    </Button>
                 </DialogActions>
             </Dialog>
         </Grid>
