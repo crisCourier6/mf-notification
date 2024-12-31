@@ -522,7 +522,8 @@ const NotificationManager: React.FC<{isAppBarVisible:boolean}> = ({ isAppBarVisi
                                 <strong>Notificación: {selectedNotification?.title}</strong>
                             </Typography>
                             <Typography variant="subtitle1">
-                                ¿Seguro que desea borrar esta notificación?
+                                ¿Seguro que desea borrar esta notificación? Si se elimina una notificación, esta también se
+                                elimina de la lista de notificaciones de todos los usuarios que aún no la han leído o borrado. UTILIZAR ESTA FUNCIÓN CON EXTREMO CUIDADO.
                             </Typography>
                         </DialogContent>
                         <DialogActions>
